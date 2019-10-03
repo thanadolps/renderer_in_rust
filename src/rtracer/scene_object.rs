@@ -12,3 +12,9 @@ impl SceneObject {
 		}
 	}
 }
+
+impl From<Shapes> for SceneObject {
+	fn from(shape: Shapes) -> Self {
+		SceneObject::new(shape)
+	}
+}

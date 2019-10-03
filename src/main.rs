@@ -47,7 +47,7 @@ fn setup() -> (rtracer::Scene, rtracer::Camera) {
 		None
 	);
 
-	let scene = rtracer::Scene::new(
+	let scene = rtracer::Scene::from_maybe_component(
 		Some(vec![floor, sphere2]),
 		Some(vec![
 			// uncomment to enable light
