@@ -1,15 +1,29 @@
-use nalgebra::{Vector3, Point3, Unit};
+use nalgebra::{Point3, Unit, Vector3};
+
+use enum_dispatch::enum_dispatch;
+
 use super::HitInfo;
 
+#[enum_dispatch]
 pub trait Shape {
 	fn intersect(&self, origin: Point3<f32>, dir: Unit<Vector3<f32>>) -> Option<HitInfo>;
 }
 
 pub mod geometric {
-	
-	use nalgebra::{Point3, Vector3, Unit};
-	use super::{Shape, HitInfo};
-	
+	use nalgebra::{Point3, Unit, Vector3};
+
+	use enum_dispatch::enum_dispatch;
+
+	use super::HitInfo;
+	use super::Shape;
+
+	#[enum_dispatch(Shape)]
+	pub enum Shapes {
+		Sphere,
+		InfinitePlane,
+		Disc
+	}
+
 	pub struct Sphere {
 		pub pos: Point3<f32>,
 		pub radius: f32

@@ -1,14 +1,14 @@
-use super::shape::Shape;
+use super::shape::geometric::Shapes;
 
-pub struct SceneObject<'a> {
+pub struct SceneObject {
 	// material: f32,
-	pub shape: Box<dyn Shape + 'a>,
+	pub shape: Shapes,
 }
 
-impl<'a> SceneObject<'a> {
-	pub fn new<T: Shape + 'a> (shape: T) -> Self {
+impl SceneObject {
+	pub fn new (shape: impl Into<Shapes>) -> Self {
 		SceneObject {
-			shape: Box::new(shape),
+			shape: shape.into(),
 		}
 	}
 }

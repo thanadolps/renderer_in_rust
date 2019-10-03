@@ -1,15 +1,16 @@
-use super::{light, SceneObject, Color3};
-use std::vec::Vec;
 use std::slice::Iter;
+use std::vec::Vec;
 
-pub struct Scene<'a> {
-	objects: Vec<SceneObject<'a>>,
-	lights: Vec<Box<dyn light::Light + 'a>>,
+use super::{Color3, light, SceneObject};
+
+pub struct Scene {
+	objects: Vec<SceneObject>,
+	lights: Vec<light::Lights>,
 	skylight: Color3,
 }
 
-impl<'a> Scene<'a> {
-	pub fn new(objs: Option<Vec<SceneObject>>, lights: Option<Vec<Box<dyn light::Light>>>, skylight: Option<Color3>)
+impl Scene {
+	pub fn new(objs: Option<Vec<SceneObject>>, lights: Option<Vec<light::Lights>>, skylight: Option<Color3>)
 		-> Scene {
 		Scene {
 			objects: objs.unwrap_or_else(Vec::new),
@@ -33,7 +34,7 @@ impl<'a> Scene<'a> {
 		self.objects.iter()
 	}
 	
-	pub fn iter_light(&self) -> Iter<Box<dyn light::Light + 'a>> {
+	pub fn iter_light(&self) -> Iter<light::Lights> {
 		self.lights.iter()
 	}
 	

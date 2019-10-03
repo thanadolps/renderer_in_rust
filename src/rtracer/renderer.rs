@@ -1,17 +1,19 @@
-use super::scene::Scene;
-use super::Camera;
-// use super::shape::Shape;
-use super::Color3;
-use super::HitInfo;
-use nalgebra::{Vector3, Point3, Unit};
-use image::ImageBuffer;
-use image::Rgb;
-use image::imageops::{dither, BiLevel, blur};
-use image::math::nq::NeuQuant;
-use itertools::Itertools;
-use itertools::MinMaxResult::*;
 use std::cmp::Ordering::Equal;
 
+use image::ImageBuffer;
+use image::imageops::{BiLevel, blur, dither};
+use image::math::nq::NeuQuant;
+use image::Rgb;
+use itertools::Itertools;
+use itertools::MinMaxResult::*;
+use nalgebra::{Point3, Unit, Vector3};
+
+use super::Camera;
+use super::Color3;
+use super::HitInfo;
+use super::light::Light;
+use super::scene::Scene;
+use super::shape::Shape;
 
 pub type RenderImage = ImageBuffer<Rgb<u8>, Vec<u8>>;
 type RenderBuffer = ImageBuffer<Rgb<f32>, Vec<f32>>;

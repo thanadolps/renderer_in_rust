@@ -1,6 +1,7 @@
+use std::collections::HashMap;
+
 use serde::Deserialize;
 use serde_json::Result;
-use std::collections::HashMap;
 
 // TODO: Finish This
 

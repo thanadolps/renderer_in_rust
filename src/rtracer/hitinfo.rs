@@ -1,4 +1,4 @@
-use nalgebra::{Point3, Vector3, Unit};
+use nalgebra::{Point3, Unit, Vector3};
 
 pub struct HitInfo {
 	pub dist: f32,

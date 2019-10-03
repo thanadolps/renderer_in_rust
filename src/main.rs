@@ -1,14 +1,16 @@
-use nalgebra::{Vector3, Point3, Rotation3, Unit, Similarity3, Translation3, UnitQuaternion, Matrix, MatrixMN,
-			U3, U4, Matrix3x4, Vector2};
+use std::f32::consts::FRAC_PI_4;
+use std::time::Instant;
+
+use nalgebra::{Matrix, Matrix3x4, MatrixMN, Point3, Rotation3, Similarity3, Translation3, U3, U4,
+			   Unit, UnitQuaternion, Vector2, Vector3};
+
+use rtracer::Color3;
+use rtracer::geometric::{Disc, InfinitePlane, Sphere};
+use rtracer::light::{AreaLight, DirectionalLight, PointLight};
+use rtracer::renderer::{render, RenderImage};
+use rtracer::SceneObject;
 
 mod rtracer;
-use rtracer::SceneObject;
-use rtracer::geometric::{Sphere, InfinitePlane, Disc};
-use rtracer::renderer::{render, RenderImage};
-use rtracer::light::{PointLight, DirectionalLight, AreaLight};
-use rtracer::Color3;
-use std::time::Instant;
-use std::f32::consts::FRAC_PI_4;
 
 fn main() {
 	// let (scene, camera) = rtracer::parser::parse_json();
@@ -16,7 +18,7 @@ fn main() {
 	test_render(&scene, &camera);
 }
 
-fn setup() -> (rtracer::Scene<'static>, rtracer::Camera) {
+fn setup() -> (rtracer::Scene, rtracer::Camera) {
 	let camera = rtracer::Camera::new(
 		Point3::new(0.0, 0.0, 0.0),
 		Rotation3::from_euler_angles(0.0, 0.0, 0.0)
@@ -52,7 +54,7 @@ fn setup() -> (rtracer::Scene<'static>, rtracer::Camera) {
 			// Box::new(light),
 			// Box::new(light2),
 			// Box::new(sun),
-			Box::new(area),
+			area.into(),
 		]),
 		None
 	);

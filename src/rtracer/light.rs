@@ -1,19 +1,28 @@
-use nalgebra::{Point3, Vector2, Vector3, Unit, Similarity3, Translation3, UnitQuaternion};
-use super::renderer::raycast;
+use itertools::Itertools;
+use nalgebra::{Point3, Similarity3, Translation3, Unit, UnitQuaternion, Vector2, Vector3};
+use rand::distributions::{Distribution, Uniform};
+use rand::thread_rng;
 
+use enum_dispatch::enum_dispatch;
+
+use super::{AREALIGHT_FINITEDIFF_LENGTH, AREALIGHT_MONTECARLO_SAMPLE};
 // use super::Color3;
 use super::Color3;
+use super::renderer::raycast;
 use super::Scene;
-use super::{AREALIGHT_MONTECARLO_SAMPLE, AREALIGHT_FINITEDIFF_LENGTH};
-use rand::distributions::{Uniform, Distribution};
-use rand::thread_rng;
-use itertools::Itertools;
 
+#[enum_dispatch]
 pub trait Light {
-	// intensity of light at position=pos at normal=norm factored in normal nattenuation
+	// intensity of light at position=pos at normal=norm factored in normal attenuation
 	fn light_at(&self, pos: Point3<f32>, norm: Unit<Vector3<f32>>, scene: &Scene) -> Color3;
 }
 
+#[enum_dispatch(Light)]
+pub enum Lights {
+	PointLight,
+	DirectionalLight,
+	AreaLight,
+}
 
 // Point Light
 pub struct PointLight {
