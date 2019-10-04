@@ -1,55 +1,74 @@
 use std::collections::HashMap;
+use std::fs;
+use std::io;
+use std::io::Write;
+use std::path::Path;
 
-use serde::Deserialize;
-use serde_json::Result;
+use nalgebra::{Matrix, Point3, U1, U3, Vector3};
+use nalgebra::base::allocator::Allocator;
+use nalgebra::base::default_allocator::DefaultAllocator;
+use ron::de;
+use ron::ser::{PrettyConfig, to_string_pretty};
+use ron::ser;
+use serde::{Deserialize, Serialize, Serializer};
 
-// TODO: Finish This
+use custom_error::custom_error;
 
-#[derive(Deserialize)]
-struct V3V3 {
-	pos: [f32; 3],
-	rot: [f32; 3],
+use crate::rtracer::{Color3, light, SceneObject};
+
+use super::{Camera, Scene};
+
+#[derive(Serialize, Deserialize)]
+pub struct SceneData {
+	pub scene: Scene,
+	pub camera: Camera,
 }
 
-#[derive(Deserialize)]
-struct V3S {
-	pos: [f32; 3],
-	val: f32,
+custom_error!{ pub SceneParserError
+	RonSerializeError {source: ser::Error} = "Encounter error while serializing scene data to ron",
+	RonDeserializeError {source: de::Error} = "Encounter error while deserialize ron to scene data",
+	IOError {source: io::Error} = "Encounter error while opening file"
 }
 
-type PosRot = V3V3;
-type PosRad = V3S;
-type PosNorm = V3V3;
-
-#[derive(Deserialize)]
-struct SceneObjectJSON {
-	spheres: Vec<PosRad>,
-	planes: Vec<PosNorm>,
+pub fn load_scene_data(path: impl AsRef<Path>) -> Result<SceneData, SceneParserError> {
+	let scene_data = de::from_reader(fs::File::open(path)?)?;
+	Ok(scene_data)
 }
 
-#[derive(Deserialize)]
-struct SceneJSONResult {
-	camera : PosRot,
-	objects: Vec<V3S>,
+pub fn save_scene_data(path: impl AsRef<Path>, scene: &SceneData) -> Result<(), SceneParserError> {
+	let encoded_scene = to_string_pretty(scene, PrettyConfig::default())?;
+	fs::write(path, encoded_scene)?;
+	Ok(())
 }
 
+pub mod serde_interface {
+    use nalgebra::{Point3, Rotation3, Vector3};
+    use serde::{Deserialize, Serialize};
 
-pub fn parse_json() {
+    use super::super::camera::Camera;
 
-	unimplemented!();
-
-    let data = r#"
-    {
-        "camera": {
-			"pos": [1.0, 2.0, 3.0],
-			"rot": [-1.0, -2.0, -3.0]
-		}
-    }"#;
-	
-	let p: SceneJSONResult = serde_json::from_str(data).unwrap();
-	
-	for (i, j) in p.camera.pos.iter().zip(p.camera.rot.iter()) {
-		println!("{} {}", i, j);
+    #[derive(Serialize, Deserialize)]
+	pub struct CameraSerdeInterface {
+		position: Point3<f32>,
+		rotation: (f32, f32, f32),
 	}
-	
+
+	impl From<CameraSerdeInterface> for Camera {
+		fn from(inter: CameraSerdeInterface) -> Camera {
+			Camera::new(
+				inter.position,
+				Rotation3::from_euler_angles(inter.rotation.0, inter.rotation.1, inter.rotation.2)
+			)
+		}
+	}
+
+	impl From<Camera> for CameraSerdeInterface {
+		fn from(camera: Camera) -> CameraSerdeInterface {
+			CameraSerdeInterface {
+				position: camera.pos,
+				rotation: camera.get_rotation().euler_angles(),
+			}
+		}
+	}
+
 }

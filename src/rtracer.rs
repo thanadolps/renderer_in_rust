@@ -2,6 +2,8 @@ use nalgebra::base::Vector3;
 
 pub use camera::Camera;
 pub use hitinfo::HitInfo;
+pub use parser::SceneData;
+pub use parser::serde_interface;
 pub use scene::Scene;
 pub use scene_object::SceneObject;
 pub use shape::geometric;

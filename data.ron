@@ -1,0 +1,83 @@
+(
+    scene: (
+        objects: [
+            (
+                shape: InfinitePlane((
+                    pos: [
+                        1,
+                        1,
+                        -1,
+                    ],
+                    norm: [
+                        0,
+                        0,
+                        1,
+                    ],
+                )),
+            ),
+            (
+                shape: Sphere((
+                    pos: [
+                        3,
+                        0,
+                        0,
+                    ],
+                    radius: 1,
+                )),
+            ),
+
+        ],
+        lights: [
+            AreaLight((
+                transformer: (
+                    isometry: (
+                        rotation: [
+                            0,
+                            0,
+                            -0.38268346,
+                            0.9238795,
+                        ],
+                        translation: [
+                            0,
+                            1,
+                            1,
+                        ],
+                    ),
+                    scaling: 0.5,
+                ),
+                light: [
+                    1,
+                    1,
+                    1,
+                ],
+            )),
+        ],
+        skylight: [
+            0,
+            0,
+            0,
+        ],
+    ),
+    camera: (
+        pos: [
+            0,
+            0,
+            0,
+        ],
+        forward: [
+            1,
+            0,
+            0,
+        ],
+        right: [
+            0,
+            1,
+            0,
+        ],
+        up: [
+            0,
+            0,
+            1,
+        ],
+    ),
+)

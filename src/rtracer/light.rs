@@ -2,6 +2,7 @@ use itertools::Itertools;
 use nalgebra::{Point3, Similarity3, Translation3, Unit, UnitQuaternion, Vector2, Vector3};
 use rand::distributions::{Distribution, Uniform};
 use rand::thread_rng;
+use serde::{Deserialize, Serialize};
 
 use enum_dispatch::enum_dispatch;
 
@@ -18,6 +19,7 @@ pub trait Light {
 }
 
 #[enum_dispatch(Light)]
+#[derive(Serialize, Deserialize)]
 pub enum Lights {
 	PointLight,
 	DirectionalLight,
@@ -25,6 +27,7 @@ pub enum Lights {
 }
 
 // Point Light
+#[derive(Serialize, Deserialize)]
 pub struct PointLight {
 	pos: Point3<f32>,
 	light: Color3
@@ -79,6 +82,7 @@ impl Light for PointLight {
 
 
 // Direction Light
+#[derive(Serialize, Deserialize)]
 pub struct DirectionalLight {
 	dir: Unit<Vector3<f32>>,
 	light: Color3,
@@ -110,7 +114,9 @@ impl Light for DirectionalLight {
 
 
 // Area Light
+#[derive(Serialize, Deserialize)]
 pub struct AreaLight {
+	// #[serde(flatten)]
 	transformer: Similarity3<f32>,
 	light: Color3,
 }

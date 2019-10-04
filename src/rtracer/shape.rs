@@ -10,20 +10,23 @@ pub trait Shape {
 }
 
 pub mod geometric {
-	use nalgebra::{Point3, Unit, Vector3};
+    use nalgebra::{Point3, Unit, Vector3};
+    use serde::{Deserialize, Serialize};
 
-	use enum_dispatch::enum_dispatch;
+    use enum_dispatch::enum_dispatch;
 
-	use super::HitInfo;
-	use super::Shape;
+    use super::HitInfo;
+    use super::Shape;
 
-	#[enum_dispatch(Shape)]
+    #[enum_dispatch(Shape)]
+	#[derive(Serialize, Deserialize)]
 	pub enum Shapes {
 		Sphere,
 		InfinitePlane,
 		Disc
 	}
 
+	#[derive(Serialize, Deserialize)]
 	pub struct Sphere {
 		pub pos: Point3<f32>,
 		pub radius: f32
@@ -61,7 +64,8 @@ pub mod geometric {
 			})
 		}
 	}
-	
+
+	#[derive(Serialize, Deserialize)]
 	pub struct InfinitePlane {
 		pub pos: Point3<f32>,
 		pub norm: Unit<Vector3<f32>>,
@@ -101,7 +105,8 @@ pub mod geometric {
 			InfinitePlane::_intersect(self.pos, self.norm, origin, dir)
 		}
 	}
-	
+
+	#[derive(Serialize, Deserialize)]
 	pub struct Disc {
 		pub pos: Point3<f32>,
 		pub norm: Unit<Vector3<f32>>,

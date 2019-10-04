@@ -1,8 +1,11 @@
 use std::slice::Iter;
 use std::vec::Vec;
 
+use serde::{Deserialize, Serialize};
+
 use super::{Color3, light, SceneObject};
 
+#[derive(Serialize, Deserialize)]
 pub struct Scene {
 	objects: Vec<SceneObject>,
 	lights: Vec<light::Lights>,

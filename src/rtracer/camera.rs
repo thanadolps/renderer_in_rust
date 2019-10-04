@@ -1,5 +1,12 @@
 use nalgebra::{Point3, Rotation3, Unit, Vector3};
+use serde::{Deserialize, Serialize};
+use serde;
 
+use crate::rtracer::serde_interface::CameraSerdeInterface;
+
+#[derive(Serialize, Deserialize, Clone)]
+// #[serde(into = "CameraSerdeInterface")]
+// #[serde(from = "CameraSerdeInterface")]
 pub struct Camera {
 	pub pos: Point3<f32>,
 	forward: Vector3<f32>,
@@ -24,5 +31,8 @@ impl Camera {
 		let dir = self.forward + i * self.right - j * self.up;
 		
 		Unit::new_normalize(dir)
+	}
+	pub fn get_rotation(&self) -> Rotation3<f32> {
+		Rotation3::face_towards(&self.forward, &self.up)
 	}
 }
