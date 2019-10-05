@@ -10,15 +10,15 @@ pub trait Shape {
 }
 
 pub mod geometric {
-    use nalgebra::{Point3, Unit, Vector3};
-    use serde::{Deserialize, Serialize};
+	use nalgebra::{Point3, Unit, Vector3};
+	use serde::{Deserialize, Serialize};
 
-    use enum_dispatch::enum_dispatch;
+	use enum_dispatch::enum_dispatch;
 
-    use super::HitInfo;
-    use super::Shape;
+	use super::HitInfo;
+	use super::Shape;
 
-    #[enum_dispatch(Shape)]
+	#[enum_dispatch(Shape)]
 	#[derive(Serialize, Deserialize)]
 	pub enum Shapes {
 		Sphere,
@@ -36,7 +36,7 @@ pub mod geometric {
 		fn intersect(&self, origin: Point3<f32>, dir: Unit<Vector3<f32>>) -> Option<HitInfo> {
 			// http://viclw17.github.io/2018/07/16/raytracing-ray-sphere-intersection/
 			// + optimization: a = 1 always (self dot = mag, mag of unit vector = 1) 
-			let dac = origin - self.pos;
+			let dac = origin - self.pos.clone();
 			let b = 2.0 * dir.dot(&dac);
 			let c = dac.magnitude_squared() - self.radius * self.radius;
 			
@@ -54,10 +54,11 @@ pub mod geometric {
 				return None;
 			}
 			
-			let intersection = origin + dir.into_inner() * dist;
-			let normal = Unit::new_normalize(intersection - self.pos);
+			let intersection = origin.clone() + dir.into_inner() * dist;
+			let normal = Unit::new_normalize(intersection - self.pos.clone());
 			
 			Some(HitInfo {
+				incoming_dir: dir,
 				dist,
 				intersection,
 				normal,
@@ -89,6 +90,7 @@ pub mod geometric {
 			
 			if dist > 0.0 { 
 				Some(HitInfo {
+					incoming_dir: dir,
 					dist,
 					intersection: origin + dir.as_ref() * dist,
 					normal: self_norm
@@ -102,7 +104,7 @@ pub mod geometric {
 	
 	impl Shape for InfinitePlane {
 		fn intersect(&self, origin: Point3<f32>, dir: Unit<Vector3<f32>>) -> Option<HitInfo> {
-			InfinitePlane::_intersect(self.pos, self.norm, origin, dir)
+			InfinitePlane::_intersect(self.pos.clone(), self.norm, origin, dir)
 		}
 	}
 
@@ -121,7 +123,8 @@ pub mod geometric {
 	
 	impl Shape for Disc {
 		fn intersect(&self, origin: Point3<f32>, dir: Unit<Vector3<f32>>) -> Option<HitInfo> {
-			let hit_info = InfinitePlane::_intersect(self.pos, self.norm, origin, dir);
+			let hit_info =
+				InfinitePlane::_intersect(self.pos.clone(), self.norm, origin, dir);
 			if let Some(hit) = hit_info {
 				if (hit.intersection - self.pos).norm_squared() < self.r_sq {
 					return Some(hit);

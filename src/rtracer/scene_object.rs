@@ -1,23 +1,19 @@
 use serde::{Deserialize, Serialize};
 
+use super::{material, Materials};
 use super::shape::geometric::Shapes;
 
 #[derive(Serialize, Deserialize)]
 pub struct SceneObject {
-	// material: f32,
+	pub material: Materials,
 	pub shape: Shapes,
 }
 
 impl SceneObject {
-	pub fn new (shape: impl Into<Shapes>) -> Self {
+	pub fn new (shape: impl Into<Shapes>, material: impl Into<Materials>) -> Self {
 		SceneObject {
+			material: material.into(),
 			shape: shape.into(),
 		}
-	}
-}
-
-impl From<Shapes> for SceneObject {
-	fn from(shape: Shapes) -> Self {
-		SceneObject::new(shape)
 	}
 }

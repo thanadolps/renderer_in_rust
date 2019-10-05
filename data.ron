@@ -2,6 +2,9 @@
     scene: (
         objects: [
             (
+                material: Reflective((
+                    fuzziness: 0.01,
+                )),
                 shape: InfinitePlane((
                     pos: [
                         1,
@@ -16,6 +19,13 @@
                 )),
             ),
             (
+                material: Diffuse((
+                    color: [
+                        1,
+                        0.5,
+                        0.5,
+                    ],
+                )),
                 shape: Sphere((
                     pos: [
                         3,
@@ -25,7 +35,6 @@
                     radius: 1,
                 )),
             ),
-
         ],
         lights: [
             AreaLight((

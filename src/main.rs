@@ -1,9 +1,7 @@
 use std::f32::consts::FRAC_PI_4;
 use std::time::Instant;
 
-use nalgebra::{Matrix, Matrix3x4, MatrixMN, Point3, Rotation3, Similarity3, Translation3, U3, U4,
-			   Unit, UnitQuaternion, Vector2, Vector3};
-use ron::ser;
+use nalgebra::{Point3, Rotation3, Unit, UnitQuaternion, Vector2, Vector3};
 
 use rtracer::Color3;
 use rtracer::geometric::{Disc, InfinitePlane, Sphere};
@@ -16,24 +14,35 @@ use crate::rtracer::SceneData;
 mod rtracer;
 
 fn main() {
-	// let scene_data = setup();
-	// rtracer::parser::save_scene_data("data.ron", &scene_data).unwrap();
+	let scene_data = setup();
+	rtracer::parser::save_scene_data("data.ron", &scene_data).unwrap();
 	let scene=  rtracer::parser::load_scene_data("data.ron").unwrap();
 	test_render(&scene);
 }
 
 fn setup() -> SceneData {
+
+	use crate::rtracer::material;
+
 	let camera = rtracer::Camera::new(
 		Point3::new(0.0, 0.0, 0.0),
 		Rotation3::from_euler_angles(0.0, 0.0, 0.0)
 	);
 
 	// let sphere = SceneObject::new(Sphere {pos: Point3::new(2.0, 0.5, 0.5), radius: 0.6});
-	let sphere2 = SceneObject::new(Sphere {pos: Point3::new(3.0, 0.0, 0.0), radius: 1.0});
-	let floor = SceneObject::new(InfinitePlane {
-		pos: Point3::new(1.0, 1.0, -1.0),
-		norm: Unit::new_normalize(Vector3::new(0.0, 0.0, 1.0))
-	});/*
+	let sphere2 =
+		SceneObject::new(
+			Sphere {pos: Point3::new(3.0, 0.0, 0.0), radius: 1.0},
+			material::Diffuse::new([1.0, 0.5, 0.5].into())
+		);
+	let floor =
+		SceneObject::new(
+			InfinitePlane {
+				pos: Point3::new(1.0, 1.0, -1.0),
+				norm: Unit::new_normalize(Vector3::new(0.0, 0.0, 1.0))
+			},
+			material::Reflective::new(0.01)
+		);/*
 	let disc = SceneObject::new(Disc::new(
 		Point3::new(1.0, 1.0, -1.0),
 		Unit::new_normalize(Vector3::new(0.0, 0.0, 1.0)),

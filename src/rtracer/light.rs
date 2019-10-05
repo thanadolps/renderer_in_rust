@@ -15,7 +15,7 @@ use super::Scene;
 #[enum_dispatch]
 pub trait Light {
 	// intensity of light at position=pos at normal=norm factored in normal attenuation
-	fn light_at(&self, pos: Point3<f32>, norm: Unit<Vector3<f32>>, scene: &Scene) -> Color3;
+	fn direct_light_at(&self, pos: Point3<f32>, norm: Unit<Vector3<f32>>, scene: &Scene) -> Color3;
 }
 
 #[enum_dispatch(Light)]
@@ -75,7 +75,7 @@ impl PointLight {
 }
 
 impl Light for PointLight {
-	fn light_at(&self, pos: Point3<f32>, norm: Unit<Vector3<f32>>, scene: &Scene) -> Color3 {
+	fn direct_light_at(&self, pos: Point3<f32>, norm: Unit<Vector3<f32>>, scene: &Scene) -> Color3 {
 		Self::_light_at(self.pos, self.light, pos, norm, scene)	
 	}
 }
@@ -95,7 +95,7 @@ impl DirectionalLight {
 }
 
 impl Light for DirectionalLight {
-	fn light_at(&self, pos: Point3<f32>, norm: Unit<Vector3<f32>>, scene: &Scene) -> Color3 {
+	fn direct_light_at(&self, pos: Point3<f32>, norm: Unit<Vector3<f32>>, scene: &Scene) -> Color3 {
 		
 		let norm_attune = -norm.dot(self.dir.as_ref());
 		
@@ -173,7 +173,7 @@ impl AreaLight{
 }
 
 impl Light for AreaLight {
-	fn light_at(&self, pos: Point3<f32>, norm: Unit<Vector3<f32>>, scene: &Scene) -> Color3 {
+	fn direct_light_at(&self, pos: Point3<f32>, norm: Unit<Vector3<f32>>, scene: &Scene) -> Color3 {
 		Self::_light_at_finite_diff(self.transformer, self.light, pos, norm, scene)
 	}
 }
