@@ -41,7 +41,7 @@ fn setup() -> SceneData {
 				pos: Point3::new(1.0, 1.0, -1.0),
 				norm: Unit::new_normalize(Vector3::new(0.0, 0.0, 1.0))
 			},
-			material::Reflective::new(0.01)
+			material::Reflective::new(0.1)
 		);/*
 	let disc = SceneObject::new(Disc::new(
 		Point3::new(1.0, 1.0, -1.0),

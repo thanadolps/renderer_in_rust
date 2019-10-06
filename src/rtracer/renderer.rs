@@ -7,6 +7,8 @@ use image::Rgb;
 use itertools::Itertools;
 use itertools::MinMaxResult::*;
 use nalgebra::{Point3, Unit, Vector3};
+use rand::prelude::{Rng, SmallRng};
+use rand::SeedableRng;
 
 use crate::rtracer::{material::Material, SceneObject};
 
@@ -24,7 +26,8 @@ type RenderBuffer = ImageBuffer<Rgb<f32>, Vec<f32>>;
 pub fn render(scene: &Scene, camera: &Camera, image_size: u32, unit_per_pixel: f32) -> RenderImage {
 	
 	let mut img: RenderBuffer = ImageBuffer::new(image_size, image_size);
-	
+	let mut rng = SmallRng::from_entropy();
+
 	let half_width = img.width()/2;
 	let half_height = img.height()/2;
 	
@@ -34,7 +37,7 @@ pub fn render(scene: &Scene, camera: &Camera, image_size: u32, unit_per_pixel: f
 			camera.ray_at_pixel_position(px, py, unit_per_pixel, half_width, half_height);
 		
 		// raycast!
-		let light = raycast_compute_light(scene, camera.pos, ray_dir);
+		let light = raycast_compute_light(scene, camera.pos, ray_dir, &mut rng);
 		*pixel = Rgb([light[0], light[1], light[2]]);
 	}
 	
@@ -44,11 +47,11 @@ pub fn render(scene: &Scene, camera: &Camera, image_size: u32, unit_per_pixel: f
 	// TODO: post process with dither and blur
 }
 
-pub fn raycast_compute_light(scene: &Scene, origin: Point3<f32>, dir: Unit<Vector3<f32>>)
+pub fn raycast_compute_light(scene: &Scene, origin: Point3<f32>, dir: Unit<Vector3<f32>>, rng: &mut impl Rng)
 	-> Color3 {
 	if let Some((hit, obj_ref)) = raycast_return_ref(scene, origin, dir) {
 		// TODO: make this dependent on material
-		obj_ref.material.compute_light(&scene, &hit, &obj_ref)
+		obj_ref.material.compute_light(&scene, &hit, &obj_ref, rng)
 	}
 	else {
 		scene.get_skylight()

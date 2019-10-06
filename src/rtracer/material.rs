@@ -1,6 +1,6 @@
 use nalgebra::{Reflection, Unit, Vector3};
+use rand::{Rng, thread_rng};
 use rand::prelude::ThreadRng;
-use rand::thread_rng;
 use rand_distr::Distribution;
 use serde::{Deserialize, Serialize};
 
@@ -10,7 +10,13 @@ use crate::rtracer::{Color3, helper, HitInfo, light::Light, Scene, SceneObject};
 
 #[enum_dispatch]
 pub trait Material {
-    fn compute_light(&self, scene: &Scene, hit_info: &HitInfo, hit_object: &SceneObject) -> Color3;
+    fn compute_light(
+        &self,
+        scene: &Scene,
+        hit_info: &HitInfo,
+        hit_object: &SceneObject,
+        rng: &mut impl Rng)
+        -> Color3;
 }
 
 #[enum_dispatch(Material)]
@@ -32,11 +38,13 @@ impl Diffuse {
 }
 
 impl Material for Diffuse {
-    fn compute_light(&self, scene: &Scene, hit_info: &HitInfo, hit_object: &SceneObject) -> Color3 {
+    fn compute_light(&self, scene: &Scene, hit_info: &HitInfo,
+                     hit_object: &SceneObject, rng: &mut impl Rng)
+        -> Color3 {
         scene.iter_light()
             .map(|x| x.direct_light_at(hit_info.intersection, hit_info.normal, scene))
             .sum::<Color3>()
-            .component_mul(&self.color)
+            .component_mul(&self.color)  // factor in material's color
     }
 }
 
@@ -52,22 +60,25 @@ impl Reflective {
 }
 
 impl Material for Reflective {
-    fn compute_light(&self, scene: &Scene, hit_info: &HitInfo, hit_object: &SceneObject) -> Color3 {
+    fn compute_light(&self, scene: &Scene, hit_info: &HitInfo,
+                     hit_object: &SceneObject, rng: &mut impl Rng) -> Color3 {
+
         use crate::rtracer::renderer::raycast_compute_light;
         use rand_distr::UnitBall;
 
-        let mut rng = thread_rng(); // TODO: not fucking do this
-
+        let reflection_noise = self.fuzziness * Vector3::from(UnitBall.sample(rng));
         let reflect_dir =
-            helper::calculate_reflect_ray(&hit_info.incoming_dir, &hit_info.normal).into_inner()
-            + self.fuzziness * Vector3::from(UnitBall.sample(&mut rng));
-
-
-
+            Unit::new_normalize(
+                helper::calculate_reflect_ray(
+                    &hit_info.incoming_dir,
+                    &hit_info.normal).into_inner()
+                    + reflection_noise
+            );
         raycast_compute_light(
             scene,
             hit_info.intersection.clone(),
-            Unit::new_normalize(reflect_dir)  // TODO: maybe change to uncheck?
+            reflect_dir,
+            rng
         )
     }
 }
