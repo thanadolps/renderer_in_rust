@@ -14,10 +14,37 @@ use crate::rtracer::SceneData;
 mod rtracer;
 
 fn main() {
-	let scene_data = setup();
-	rtracer::parser::save_scene_data("data.ron", &scene_data).unwrap();
+	// let scene_data = setup();
+	// rtracer::parser::save_scene_data("data.ron", &scene_data).unwrap();
+	// test();
 	let scene=  rtracer::parser::load_scene_data("data.ron").unwrap();
 	test_render(&scene);
+}
+
+fn test() {
+
+	use std::any::type_name;
+
+	let q2: UnitQuaternion<f64> =
+		UnitQuaternion::from_axis_angle(&Vector3::x_axis(), std::f64::consts::PI/4.0);
+
+	// println!("{}", (q2 * Vector3::y_axis()).into_inner());
+
+
+
+
+	/*let k = &mut u;
+	let l: Unit<Vector3<f64>> = (q2 * *k);
+	println!("{}", l.into_inner());
+
+	*k = l;
+	println!("{}", k.into_inner());*/
+
+	// let mut u: Unit<Vector3<f64>> = Vector3::y_axis();
+	(0..8).scan(Vector3::y_axis(), |q: &mut Unit<Vector3<f64>>, _| {
+		*q = q2 * *q;
+		Some(*q)
+	}).for_each(|x| println!("{}", x.into_inner()));
 }
 
 fn setup() -> SceneData {
@@ -29,11 +56,17 @@ fn setup() -> SceneData {
 		Rotation3::from_euler_angles(0.0, 0.0, 0.0)
 	);
 
-	// let sphere = SceneObject::new(Sphere {pos: Point3::new(2.0, 0.5, 0.5), radius: 0.6});
+	let sphere =
+        SceneObject::new(
+            Sphere {pos: Point3::new(3.0, 2.0, 0.0), radius: 0.5},
+            // material::Diffuse::new([0.5, 1.0, 0.5].into()),
+            material::PerfectReflective::new([0.5, 0.5, 1.0].into())
+        );
 	let sphere2 =
 		SceneObject::new(
 			Sphere {pos: Point3::new(3.0, 0.0, 0.0), radius: 1.0},
-			material::Diffuse::new([1.0, 0.5, 0.5].into())
+			material::Diffuse::new([1.0, 0.5, 0.5].into()),
+            //material::PerfectReflective,
 		);
 	let floor =
 		SceneObject::new(
@@ -41,8 +74,9 @@ fn setup() -> SceneData {
 				pos: Point3::new(1.0, 1.0, -1.0),
 				norm: Unit::new_normalize(Vector3::new(0.0, 0.0, 1.0))
 			},
-			material::Reflective::new(0.1)
-		);/*
+			// material::Reflective::new(0.5, 3)
+		        material::Diffuse::new([0.5, 0.5, 1.0].into())
+        );/*
 	let disc = SceneObject::new(Disc::new(
 		Point3::new(1.0, 1.0, -1.0),
 		Unit::new_normalize(Vector3::new(0.0, 0.0, 1.0)),
@@ -61,7 +95,7 @@ fn setup() -> SceneData {
 	);
 
 	let scene = rtracer::Scene::from_maybe_component(
-		Some(vec![floor, sphere2]),
+		Some(vec![sphere, floor, sphere2]),
 		Some(vec![
 			// uncomment to enable light
 			// light.into(),
@@ -69,7 +103,7 @@ fn setup() -> SceneData {
 			// sun.into(),
 			area.into(),
 		]),
-		None
+		Some(Color3::new(0.05, 0.07, 0.1))
 	);
 
 	SceneData {scene, camera}

@@ -50,7 +50,7 @@ impl PointLight {
 		let norm_attune = -norm.dot(dir_to_obj.as_ref());
 		
 		if norm_attune <= 0.0 {
-			return scene.get_skylight();
+			return [0.0, 0.0, 0.0].into();
 		}
 		
 		let hit_info = raycast(scene, self_pos, dir_to_obj);
@@ -62,7 +62,7 @@ impl PointLight {
 				// 1e-4 is for mitigate float unstable comparision
 				if hit.dist + 1e-4 < dist_to_obj{
 					// hit something before the object (or at least near enough)
-					scene.get_skylight()
+					Color3::from([0.0, 0.0, 0.0])
 				}
 				else {
 					// actually hit object

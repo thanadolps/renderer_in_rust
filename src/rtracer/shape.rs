@@ -43,7 +43,7 @@ pub mod geometric {
 			let discriminant = b*b - 4.0*c;
 			
 			// if not intersecting
-			if discriminant < 0.0 {
+			if discriminant <= 1e-6 {
 				return None;
 			}
 			
@@ -82,7 +82,7 @@ pub mod geometric {
 		) -> Option<HitInfo> {
 			let deno = dir.dot(self_norm.as_ref());
 			
-			if deno > -1e-4 {
+			if deno > -1e-2 {
 				return None;
 			}
 			
